@@ -16,16 +16,17 @@
 - [x] Cloudflare deployment succeeded: `https://fanforge.emily-737.workers.dev`.
 - [x] Cloudflare deployment runbook documented.
 - [x] Custom-domain migration runbook documented.
-- [x] Execution roadmap created for the remaining build phases.
+- [x] Execution roadmap created for remaining build phases.
 - [x] Governance automation added (`scripts/check-governance.js`) and `docs:governance` npm script.
 - [x] Release governance checklist documented.
 - [x] `shippex.app` custom domain attached and returns HTTP 200.
 - [x] Confirmed Cloudflare zone ID for `shippex.app` is `49d6b3c84f37226ca505433768c762a4`.
 - [x] GitHub remote configured: `https://github.com/helloemzy/fanforge`.
 - [x] Git repository pushed to GitHub `main` and deployment workflow wired.
-- [x] GitHub secret wiring completed:
+- [x] GitHub secret wiring to Cloudflare is complete:
   - `CLOUDFLARE_API_TOKEN`
   - `CLOUDFLARE_ACCOUNT_ID`
+- [x] Verified GitHub workflow run `22750990026` completed successfully on latest docs/metadata push.
 
 ## Live Cloudflare Route Checks
 
@@ -36,34 +37,30 @@
 - `GET /robots.txt` -> `200`
 - `GET /ai-policy.txt` -> `200`
 - `GET https://shippex.app/` -> `200`
+  - Resolved via DoH to Vercel edge IPs: `172.67.183.14`, `104.21.36.13` but headers indicate request still reaching FanForge stack (no Vercel error header).
 - `GET https://shippex.app/robots.txt` -> `200`
 - `GET https://shippex.app/ai-policy.txt` -> `200`
 - `GET https://www.shippex.app/` -> `404` (`x-vercel-error: DEPLOYMENT_NOT_FOUND`)
-- `shippex.app` zone DNS currently resolves through Cloudflare nameservers `cash.ns.cloudflare.com` and `sarah.ns.cloudflare.com`.
+- DNS nameserver answer from Cloudflare DNS for both hosts currently returns Vercel A records.
 
 ## Latest Verification
 
-- `npx wrangler deploy` succeeded (baseline worker + base domain)
-  - `shippex.app` attached to Workers with HTTP 200
-- `npx wrangler deploy --domain shippex.app --domain www.shippex.app` failed with Cloudflare API 100117
-  - Hostname `'www.shippex.app'` already has externally managed DNS records
-- Re-run on 2026-03-06 02:24 UTC after reported cleanup still failed with API 100117.
-- Direct check confirms `www.shippex.app` resolves to Vercel IPs
-  - `172.67.183.14` and `104.21.36.13`
-- Re-trying with explicit `override_existing_dns_record: true` payload to Cloudflare API also fails with 100117.
-- Latest retry (2026-03-06 02:24 UTC) still reports 100117.
-- Direct API verification using current OAuth token:
-  - `GET /zones?name=shippex.app` returns zone id `49d6b3c84f37226ca505433768c762a4`.
-  - `GET /zones/{zone}/dns_records` returns auth error (DNS scope missing).
-  - `GET /accounts/{account}/workers/scripts/fanforge/domains/records` currently returns only `shippex.app` binding.
+- `npx wrangler deploy` baseline succeeds.
+- `npx wrangler deploy --domain shippex.app --domain www.shippex.app` fails with Cloudflare API 100117:
+  - Hostname `'www.shippex.app'` already has externally managed DNS records (A/CNAME).
+- Re-run attempt after prior cleanup confirmation also fails with code 100117.
+- Cloudflare API token used is OAuth token with `zone:read` but no DNS write/edit scope.
+- `GET /accounts/73711a4e0ed22fe53395252395a22c60/workers/scripts/fanforge/domains/records` returns only:
+  - `shippex.app`
+  - (no `www.shippex.app` binding)
 
 ## Current Status
 
-- `shippex.app` custom domain is live and correct.
-- `www.shippex.app` is blocked by residual DNS at DNS level:
-  - Cloudflare nameserver check shows zone `shippex.app` is active on Cloudflare.
-  - DNS query to public resolvers shows `www.shippex.app` resolves to Vercel edge A records, not Worker route.
-- GitHub Actions deploy runs are succeeding (most recent known run: `22750816439`).
+- `shippex.app` custom domain is live and reachable.
+- `www.shippex.app` is blocked by residual DNS at DNS level.
+  - Cloudflare DNS shows both `shippex.app` and `www.shippex.app` as Vercel A-record targets.
+  - Route binding for `www.shippex.app` cannot be attached without clearing legacy DNS records.
+- GitHub Actions deploy pipeline is healthy and latest run is successful.
 
 ## Pending Production Configuration
 
@@ -77,16 +74,16 @@
 - [ ] `STORAGE_SECRET_ACCESS_KEY`
 - [ ] `STORAGE_PUBLIC_BASE_URL`
 - [ ] Remove legacy `www.shippex.app` DNS records (A/CNAME) so Cloudflare can attach.
-- [ ] Ensure DNS-capable Cloudflare credentials are available (`zone:read`, `DNS:Edit` or equivalent) before retrying `www` attach.
-- [ ] Run DNS cleanup verification: `curl -I https://www.shippex.app` and `curl -s '...dns-query?name=www.shippex.app&type=A'` after cleanup.
-- [ ] Run `curl -I https://www.shippex.app` in a dry deploy check and re-run attach command.
+- [ ] Provision a DNS-edit-capable Cloudflare token and remove conflicting records.
+- [ ] Re-run `npx wrangler deploy --domain shippex.app --domain www.shippex.app`.
+- [ ] Re-run `curl -I https://www.shippex.app` verification.
 - [ ] Run `npm run check` in production-equivalent environment after each deploy.
 
 ## Notes
 
 - `www.shippex.app` remains blocked by externally managed DNS (`A` records pointing to Vercel) after zone migration.
 - Domain attach is complete only after both hosts validate and return the application payload.
-- All evidence for this blocker is captured in deployment logs and DNS lookups.
+- All evidence for this blocker is captured in deployment logs, DNS lookups, and API responses.
 
 ## Git Repo Status (2026-03-06)
 
