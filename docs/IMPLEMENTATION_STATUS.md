@@ -46,7 +46,7 @@
 ## Latest Verification
 
 - `npx wrangler deploy` baseline succeeds.
-- `npx wrangler deploy --domain shippex.app --domain www.shippex.app` fails with Cloudflare API 100117:
+- `npx wrangler deploy --domain shippex.app --domain www.shippex.app` re-run at 2026-03-06 06:19:23 UTC still fails with Cloudflare API 100117:
   - Hostname `'www.shippex.app'` already has externally managed DNS records (A/CNAME).
 - Re-run attempt after prior cleanup confirmation also fails with code 100117.
 - Cloudflare API token used is OAuth token with `zone:read` but no DNS write/edit scope.
@@ -58,7 +58,7 @@
 
 - `shippex.app` custom domain is live and reachable.
 - `www.shippex.app` is blocked by residual DNS at DNS level.
-  - Cloudflare DNS shows both `shippex.app` and `www.shippex.app` as Vercel A-record targets.
+  - `www.shippex.app` still resolves to Vercel A-record targets (`172.67.183.14`, `104.21.36.13`) across repeated checks.
   - Route binding for `www.shippex.app` cannot be attached without clearing legacy DNS records.
 - GitHub Actions deploy pipeline is healthy and latest run is successful.
 
