@@ -82,3 +82,11 @@
 - `www.shippex.app` remains blocked by externally managed DNS (`A` records pointing to Vercel) after zone migration.
 - Domain attach is complete only after both hosts validate and return the application payload.
 - All evidence for this blocker is captured in deployment logs and DNS lookups.
+
+## Git Repo Status (2026-03-06)
+
+- [x] Initialized `/Users/emily/fanforge` as a git repository.
+- [x] Made a root commit: `4ae98eb` including deployment workflow, docs, and migration fixes.
+- [ ] No GitHub remote exists yet; repository has not been pushed.
+- [ ] GitHub-hosted deploy trigger to Cloudflare is documented and ready in `.github/workflows/cloudflare-workers-deploy.yml`.
+- [ ] GitHub secret wiring to Cloudflare is still pending: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
