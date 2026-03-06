@@ -1,0 +1,43 @@
+<%- include('partials/head', { pageTitle: 'Verify email' }) %>
+
+<section class="auth-shell reveal">
+  <p class="eyebrow">Account trust check</p>
+  <h1>Verify your email to continue</h1>
+  <p>
+    Verified email is required for full chapter reading, publishing, and interaction features.
+    This reduces throwaway bot accounts and protects writers.
+  </p>
+
+  <% if (notice) { %>
+    <p class="flash success"><%= notice %></p>
+  <% } %>
+
+  <% if (error) { %>
+    <p class="flash error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/auth/verify-email/resend" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="hidden" name="next" value="<%= nextPath %>" />
+    <button type="submit" class="button-link">Resend verification email</button>
+  </form>
+
+  <% if (manualVerificationPath) { %>
+    <div class="editor-notes">
+      <strong>Manual verification link</strong>
+      <p class="quiet">
+        This appears because the email provider is not configured yet.
+      </p>
+      <p>
+        <a href="<%= manualVerificationPath %>">Verify now</a>
+      </p>
+    </div>
+  <% } %>
+
+  <p class="quiet">
+    After verification, you can continue here:
+    <a href="<%= nextPath %>"><%= nextPath %></a>
+  </p>
+</section>
+
+<%- include('partials/foot') %>

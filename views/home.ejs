@@ -1,0 +1,213 @@
+<%- include('partials/head', { pageTitle: 'Discover fanfiction' }) %>
+
+<section class="hero-grid reveal">
+  <div class="hero-copy">
+    <p class="eyebrow">A fandom home built for readers and writers</p>
+    <h1>Make your fic discoverable by title, not harvestable by bots.</h1>
+    <p class="hero-lead">
+      FanForge keeps browsing public for fandom discovery, while full chapter text stays behind
+      verified reader sessions with anti-scrape controls.
+    </p>
+    <div class="hero-actions">
+      <% if (!currentUser) { %>
+        <a class="button-link" href="/auth/register">Create your free account</a>
+        <a class="ghost-link" href="#fresh-works">Browse stories first</a>
+      <% } else { %>
+        <a class="button-link" href="/works/new">Publish your next chapter</a>
+        <a class="ghost-link" href="#fresh-works">See what readers love</a>
+      <% } %>
+    </div>
+  </div>
+
+  <aside class="hero-proof">
+    <h2>Community at a glance</h2>
+    <div class="proof-grid">
+      <article>
+        <strong><%= (snapshot?.work_count || 0).toLocaleString('en-US') %></strong>
+        <span>published works</span>
+      </article>
+      <article>
+        <strong><%= (snapshot?.writer_count || 0).toLocaleString('en-US') %></strong>
+        <span>registered writers</span>
+      </article>
+      <article>
+        <strong><%= (snapshot?.comment_count || 0).toLocaleString('en-US') %></strong>
+        <span>reader comments</span>
+      </article>
+      <article>
+        <strong><%= (snapshot?.kudos_count || 0).toLocaleString('en-US') %></strong>
+        <span>kudos sent</span>
+      </article>
+    </div>
+  </aside>
+</section>
+
+<section class="value-strip reveal">
+  <article>
+    <h3>Find your exact niche</h3>
+    <p>Fandom filters, tag combos, ratings, and status views that get readers to your work faster.</p>
+  </article>
+  <article>
+    <h3>Read without friction</h3>
+    <p>Phone and desktop layouts are tuned for long sessions, not cramped archive scanning.</p>
+  </article>
+  <article>
+    <h3>AI Shield Promise</h3>
+    <p>Known AI crawlers are blocked, chapters require verified email + verified readers, and fanworks are never licensed for training.</p>
+  </article>
+</section>
+
+<section class="filters-panel reveal" aria-label="Story filters">
+  <div class="panel-head">
+    <h2>Find your next obsession</h2>
+    <p>Filter by fandom, tag, rating, status, or text search in one pass.</p>
+  </div>
+
+  <form method="get" action="/" class="filter-grid">
+    <label>
+      Search
+      <input type="search" name="q" value="<%= filters.q %>" placeholder="title, summary, keywords" />
+    </label>
+
+    <label>
+      Fandom
+      <input type="text" name="fandom" value="<%= filters.fandom %>" placeholder="Arcane, Naruto, etc." />
+    </label>
+
+    <label>
+      Rating
+      <select name="rating">
+        <option value="">Any</option>
+        <% ['General', 'Teen', 'Mature', 'Explicit'].forEach((value) => { %>
+          <option value="<%= value %>" <%= filters.rating === value ? 'selected' : '' %>><%= value %></option>
+        <% }); %>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select name="status">
+        <option value="">Any</option>
+        <% ['WIP', 'Complete'].forEach((value) => { %>
+          <option value="<%= value %>" <%= filters.status === value ? 'selected' : '' %>><%= value %></option>
+        <% }); %>
+      </select>
+    </label>
+
+    <label>
+      Tag
+      <input type="text" name="tag" value="<%= filters.tag %>" placeholder="slow burn" />
+    </label>
+
+    <div class="filter-actions">
+      <button type="submit" class="button-link">Apply filters</button>
+      <a href="/" class="ghost-link">Reset</a>
+    </div>
+  </form>
+</section>
+
+<section class="content-grid" id="fresh-works">
+  <div class="works-column">
+    <div class="section-heading">
+      <h2>Fresh from the archive</h2>
+      <% if (currentUser) { %>
+        <a class="ghost-link" href="/works/new">Publish new work</a>
+      <% } %>
+    </div>
+
+    <% if (works.length === 0) { %>
+      <article class="empty-card reveal">
+        <h3>No matches yet</h3>
+        <p>
+          Widen one filter, remove a tag, or publish the first story for this niche.
+        </p>
+      </article>
+    <% } %>
+
+    <% works.forEach((work) => { %>
+      <article class="work-card reveal">
+        <% if (work.cover_path) { %>
+          <a href="/works/<%= work.id %>" class="cover-wrap">
+            <img src="<%= work.cover_path %>" alt="Cover for <%= work.title %>" loading="lazy" />
+          </a>
+        <% } else { %>
+          <a href="/works/<%= work.id %>" class="cover-wrap cover-placeholder" aria-label="Open <%= work.title %>">
+            <span>No cover</span>
+          </a>
+        <% } %>
+
+        <div class="work-copy">
+          <div class="meta-row">
+            <span><%= work.fandom %></span>
+            <span><%= work.rating %></span>
+            <span><%= work.status %></span>
+          </div>
+          <h3>
+            <a href="/works/<%= work.id %>"><%= work.title %></a>
+          </h3>
+          <p class="summary"><%= work.summary %></p>
+          <ul class="tag-list">
+            <% work.tags.forEach((tag) => { %>
+              <li>
+                <a href="/?tag=<%= encodeURIComponent(tag) %>"><%= tag %></a>
+              </li>
+            <% }); %>
+          </ul>
+          <div class="meta-row quiet">
+            <span>by <%= work.author %></span>
+            <span><%= work.word_count.toLocaleString('en-US') %> words</span>
+            <span><%= work.kudos_count %> kudos</span>
+            <span><%= work.comments_count %> comments</span>
+            <span><%= shortDate(work.created_at) %></span>
+          </div>
+        </div>
+      </article>
+    <% }); %>
+  </div>
+
+  <aside class="side-column reveal">
+    <section>
+      <h3>Trending tags</h3>
+      <p class="quiet">What readers are currently opening, discussing, and bookmarking.</p>
+      <ul class="tag-cloud">
+        <% trendingTags.forEach((tag) => { %>
+          <li>
+            <a href="/?tag=<%= encodeURIComponent(tag.name) %>">
+              <%= tag.name %>
+              <small><%= tag.usage_count %></small>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Top fandoms</h3>
+      <p class="quiet">Browse the most active universes across the archive.</p>
+      <ul class="fandom-list">
+        <% fandoms.forEach((item) => { %>
+          <li>
+            <a href="/?fandom=<%= encodeURIComponent(item.fandom) %>">
+              <span><%= item.fandom %></span>
+              <small><%= item.work_count %></small>
+            </a>
+          </li>
+        <% }); %>
+      </ul>
+    </section>
+
+    <section>
+        <h3>AI Shield commitments</h3>
+        <p class="quiet">Your story is protected by policy and technical barriers:</p>
+        <ul class="commitment-list">
+          <li>Known AI crawler user-agents are actively denied</li>
+          <li>Public SEO is title-level while full chapter text is verified-email member only</li>
+          <li>Every member read includes invisible provenance signatures</li>
+          <li>No licensing of fanworks for model training, ever</li>
+        </ul>
+        <p class="quiet"><a href="/ai-policy.txt">Read the full AI Shield policy</a></p>
+      </section>
+  </aside>
+</section>
+
+<%- include('partials/foot') %>

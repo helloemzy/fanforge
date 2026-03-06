@@ -1,0 +1,92 @@
+<%- include('partials/head', { pageTitle: mode === 'create' ? 'Publish work' : 'Edit work' }) %>
+
+<section class="editor-shell reveal">
+  <p class="eyebrow"><%= mode === 'create' ? 'New publication' : 'Revision mode' %></p>
+  <h1><%= mode === 'create' ? 'Publish a story readers can find' : 'Refine your story entry' %></h1>
+  <p>
+    Strong metadata gets your work discovered faster. Clear summary + focused tags
+    usually outperform extra formatting.
+  </p>
+
+  <div class="editor-notes">
+    <strong>Quick quality checklist</strong>
+    <ul>
+      <li>Use fandom and rating accurately</li>
+      <li>Write a summary that sets stakes and tone</li>
+      <li>Keep tags specific, not overloaded</li>
+    </ul>
+  </div>
+
+  <% if (error) { %>
+    <p class="flash error"><%= error %></p>
+  <% } %>
+
+  <form
+    method="post"
+    enctype="multipart/form-data"
+    action="<%= mode === 'create' ? '/works/new' : `/works/${work.id}/edit` %>"
+    class="stack-form"
+  >
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+    <label>
+      Title
+      <input type="text" name="title" maxlength="140" required value="<%= values.title %>" />
+    </label>
+
+    <label>
+      Fandom
+      <input type="text" name="fandom" maxlength="80" required value="<%= values.fandom %>" />
+    </label>
+
+    <div class="split-row">
+      <label>
+        Rating
+        <select name="rating" required>
+          <% ['General', 'Teen', 'Mature', 'Explicit'].forEach((value) => { %>
+            <option value="<%= value %>" <%= values.rating === value ? 'selected' : '' %>><%= value %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>
+        Status
+        <select name="status" required>
+          <% ['WIP', 'Complete'].forEach((value) => { %>
+            <option value="<%= value %>" <%= values.status === value ? 'selected' : '' %>><%= value %></option>
+          <% }); %>
+        </select>
+      </label>
+    </div>
+
+    <label>
+      Tags (comma separated, up to 10)
+      <input type="text" name="tags" maxlength="500" value="<%= values.tags %>" />
+    </label>
+
+    <label>
+      Summary
+      <textarea name="summary" rows="4" maxlength="1400" required><%= values.summary %></textarea>
+    </label>
+
+    <label>
+      Story content
+      <textarea name="content" rows="18" maxlength="200000" required><%= values.content %></textarea>
+    </label>
+
+    <label>
+      Cover image (optional, max 2MB)
+      <input type="file" name="coverImage" accept="image/png, image/jpeg, image/webp, image/gif" />
+    </label>
+
+    <% if (mode === 'edit' && work.cover_path) { %>
+      <p class="quiet">Current cover: <a href="<%= work.cover_path %>">view image</a></p>
+    <% } %>
+
+    <button type="submit" class="button-link">
+      <%= mode === 'create' ? 'Publish now' : 'Save changes' %>
+    </button>
+  </form>
+</section>
+
+<%- include('partials/foot') %>

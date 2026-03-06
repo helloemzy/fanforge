@@ -1,0 +1,10 @@
+<%- include('partials/head', { pageTitle: `Error ${statusCode}` }) %>
+
+<section class="auth-shell reveal">
+  <p class="eyebrow">Error <%= statusCode %></p>
+  <h1>Request failed</h1>
+  <p><%= message %></p>
+  <a class="button-link" href="/">Back home</a>
+</section>
+
+<%- include('partials/foot') %>

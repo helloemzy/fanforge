@@ -1,0 +1,56 @@
+<%- include('partials/head', { pageTitle: 'Reader verification' }) %>
+
+<section class="auth-shell reveal">
+  <p class="eyebrow">Reader security check</p>
+  <h1>Verify human reader access</h1>
+  <p>
+    We keep full fanfiction chapters behind a quick human check to reduce scraping and copy bots.
+  </p>
+
+  <ul class="auth-points">
+    <li>Public pages stay discoverable by title</li>
+    <li>Full story text is verified-member only</li>
+    <li>Each full read carries invisible provenance marks</li>
+  </ul>
+
+  <% if (error) { %>
+    <p class="flash error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/auth/human-check" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="hidden" name="next" value="<%= nextPath %>" />
+
+    <label class="honeypot-field" aria-hidden="true">
+      Leave this empty
+      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+    </label>
+
+    <% if (turnstileEnabled) { %>
+      <div class="turnstile-wrap">
+        <div class="cf-turnstile" data-sitekey="<%= turnstileSiteKey %>"></div>
+      </div>
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <% } else { %>
+      <input type="hidden" name="challengeToken" value="<%= challenge.token %>" />
+      <label>
+        Solve this quickly: <strong><%= challenge.question %></strong>
+        <input
+          type="number"
+          name="challengeAnswer"
+          inputmode="numeric"
+          autocomplete="off"
+          required
+        />
+      </label>
+    <% } %>
+
+    <button type="submit" class="button-link">Unlock full chapter reading</button>
+  </form>
+
+  <p class="quiet">
+    This check expires automatically and may be requested again on new devices or sessions.
+  </p>
+</section>
+
+<%- include('partials/foot') %>

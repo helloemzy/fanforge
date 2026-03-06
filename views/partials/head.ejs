@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <% const robotsDirective = robotsTag || 'index,follow,noarchive,nosnippet,max-snippet:0,max-image-preview:none,notranslate,noai,noimageai'; %>
+    <meta name="robots" content="<%= robotsDirective %>" />
+    <meta name="googlebot" content="<%= robotsDirective %>" />
+    <meta name="bingbot" content="<%= robotsDirective %>" />
+    <meta name="ai-policy" content="noai,noimageai,noarchive" />
+    <title><%= pageTitle ? `${pageTitle} · FanForge` : 'FanForge' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/public/styles.css" />
+    <script defer src="/public/app.js"></script>
+  </head>
+  <body>
+    <div class="noise-layer" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="wordmark" href="/">
+        <span class="wordmark-main">FanForge</span>
+        <span class="wordmark-kicker">Public titles, protected chapters</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Read</a>
+        <% if (currentUser) { %>
+          <a href="/works/new">Write</a>
+          <% if (!currentUser.emailVerified) { %>
+            <a href="/auth/verify-email/sent">Verify email</a>
+          <% } %>
+          <span class="user-chip"><%= currentUser.username %></span>
+          <form method="post" action="/auth/logout" class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="text-button">Log out</button>
+          </form>
+        <% } else { %>
+          <a href="/auth/login">Log in</a>
+          <a class="button-link" href="/auth/register">Start free</a>
+        <% } %>
+      </nav>
+    </header>
+    <main class="page-shell">

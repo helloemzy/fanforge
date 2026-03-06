@@ -1,0 +1,10 @@
+node_modules
+.env
+npm-debug.log*
+data/*.db*
+uploads/covers/*
+!uploads/covers/.gitkeep
+.vercel
+
+.wrangler
+.vercel

@@ -1,0 +1,51 @@
+<%- include('partials/head', { pageTitle: 'Log in' }) %>
+
+<section class="auth-shell reveal">
+  <p class="eyebrow">Welcome back</p>
+  <h1>Return to your archive</h1>
+  <p>
+    Continue your current reads, publish new chapters, and support writers in an
+    AI-shielded fandom space with verified-email, verified-reader full chapters.
+  </p>
+
+  <% if (error) { %>
+    <p class="flash error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/auth/login" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="hidden" name="next" value="<%= nextPath %>" />
+
+    <label>
+      Email
+      <input
+        type="email"
+        name="email"
+        value="<%= values.email %>"
+        maxlength="160"
+        autocomplete="email"
+        required
+      />
+    </label>
+
+    <label>
+      Password
+      <input
+        type="password"
+        name="password"
+        maxlength="128"
+        autocomplete="current-password"
+        required
+      />
+    </label>
+
+    <button type="submit" class="button-link">Log in securely</button>
+  </form>
+
+  <p>
+    New to FanForge?
+    <a href="/auth/register">Create an account</a>
+  </p>
+</section>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fanforge",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-03-05",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "find_additional_modules": true,
+  "base_dir": ".",
+  "preserve_file_names": true,
+  "rules": [
+    {
+      "type": "Data",
+      "globs": ["views/**/*.ejs", "public/**/*"],
+      "fallthrough": true
+    }
+  ],
+  "vars": {
+    "NODE_ENV": "production",
+    "ALLOW_MANUAL_VERIFY_LINK": "0",
+    "CLOUDFLARE_RUNTIME": "1"
+  }
+}

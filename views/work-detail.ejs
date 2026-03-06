@@ -1,0 +1,144 @@
+<%- include('partials/head', { pageTitle: work.title }) %>
+
+<article class="detail-shell reveal">
+  <header class="detail-header">
+    <div>
+      <p class="eyebrow"><%= work.fandom %></p>
+      <h1><%= work.title %></h1>
+      <p class="meta-row quiet">
+        <span>by <%= work.author %></span>
+        <span><%= work.rating %></span>
+        <span><%= work.status %></span>
+        <span><%= work.word_count.toLocaleString('en-US') %> words</span>
+        <span>posted <%= shortDate(work.created_at) %></span>
+      </p>
+    </div>
+
+    <% if (work.cover_path) { %>
+      <img class="detail-cover" src="<%= work.cover_path %>" alt="Cover for <%= work.title %>" />
+    <% } %>
+  </header>
+
+  <section class="summary-block">
+    <h2>Premise</h2>
+    <div><%- textToParagraphs(work.summary) %></div>
+  </section>
+
+  <ul class="tag-list large">
+    <% work.tags.forEach((tag) => { %>
+      <li><a href="/?tag=<%= encodeURIComponent(tag) %>"><%= tag %></a></li>
+    <% }); %>
+  </ul>
+
+  <section class="action-row">
+    <% if (currentUser) { %>
+      <form method="post" action="/works/<%= work.id %>/kudos" class="inline-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <button type="submit" class="button-link" <%= userHasKudos ? 'disabled' : '' %>>
+          <%= userHasKudos ? 'Kudos sent' : 'Leave kudos' %>
+        </button>
+      </form>
+
+      <form method="post" action="/works/<%= work.id %>/bookmark" class="inline-form stretch">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <input type="text" name="note" maxlength="300" placeholder="Bookmark note (optional)" value="<%= currentBookmark?.note || '' %>" />
+        <button type="submit" class="ghost-link">Save bookmark</button>
+      </form>
+
+      <% if (currentUser.id === work.author_id) { %>
+        <a class="ghost-link" href="/works/<%= work.id %>/edit">Edit story</a>
+      <% } %>
+    <% } else { %>
+      <a class="button-link" href="/auth/login?next=<%= encodeURIComponent(`/works/${work.id}`) %>">Log in to unlock full story</a>
+    <% } %>
+
+    <p class="meta-row quiet">
+      <span><%= work.kudos_count %> kudos</span>
+      <span><%= work.bookmarks_count %> bookmarks</span>
+      <span><%= work.comments_count %> comments</span>
+    </p>
+  </section>
+
+  <section class="reader-toolbar" data-reader-toolbar aria-label="Reader controls">
+    <div class="reader-toolbar-group">
+      <strong>Reader mode</strong>
+      <button type="button" class="ghost-link reader-control" data-reader-action="font-down">A-</button>
+      <button type="button" class="ghost-link reader-control" data-reader-action="font-up">A+</button>
+      <button type="button" class="ghost-link reader-control" data-reader-action="line-down">Tight</button>
+      <button type="button" class="ghost-link reader-control" data-reader-action="line-up">Spacious</button>
+    </div>
+    <div class="reader-toolbar-group">
+      <strong>Theme</strong>
+      <button type="button" class="ghost-link reader-control" data-reader-theme="paper">Paper</button>
+      <button type="button" class="ghost-link reader-control" data-reader-theme="sepia">Sepia</button>
+      <button type="button" class="ghost-link reader-control" data-reader-theme="night">Night</button>
+    </div>
+  </section>
+
+  <section class="story-content">
+    <h2>Story</h2>
+
+    <% if (contentLocked) { %>
+      <aside class="lock-banner">
+        <h3>Preview mode: <%= previewWordCount.toLocaleString('en-US') %> words shown</h3>
+        <p>
+          Public pages are indexed by title, but full chapter text stays behind verified member sessions.
+          This protects writers and reduces scraping.
+        </p>
+        <div class="hero-actions">
+          <% if (!currentUser) { %>
+            <a class="button-link" href="/auth/register?next=<%= encodeURIComponent(`/works/${work.id}`) %>">Create free account</a>
+            <a class="ghost-link" href="/auth/login?next=<%= encodeURIComponent(`/works/${work.id}`) %>">Log in</a>
+          <% } else if (needsEmailVerification) { %>
+            <a class="button-link" href="/auth/verify-email/sent?next=<%= encodeURIComponent(`/works/${work.id}`) %>">Verify email first</a>
+            <a class="ghost-link" href="/ai-policy.txt">Why this is required</a>
+          <% } else if (needsHumanCheck) { %>
+            <a class="button-link" href="/auth/human-check?next=<%= encodeURIComponent(`/works/${work.id}`) %>">Verify you are human</a>
+            <a class="ghost-link" href="/ai-policy.txt">Read shield policy</a>
+          <% } %>
+        </div>
+      </aside>
+    <% } else { %>
+      <p class="quiet">
+        AI Shield active: your reader view contains invisible provenance markers to help detect unauthorized copying.
+      </p>
+    <% } %>
+
+    <div id="reader-content" class="reader-content" data-reader-content><%- storyHtml %></div>
+  </section>
+
+  <section id="comments" class="comments-shell">
+    <h2>Reader discussion</h2>
+
+    <% if (currentUser) { %>
+      <form method="post" action="/works/<%= work.id %>/comments" class="stack-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <textarea name="body" rows="4" maxlength="1500" placeholder="Share a thoughtful comment" required></textarea>
+        <button type="submit" class="button-link">Post comment</button>
+      </form>
+    <% } else { %>
+      <p>
+        <a href="/auth/login?next=<%= encodeURIComponent(`/works/${work.id}`) %>">Log in</a>
+        to comment and bookmark.
+      </p>
+    <% } %>
+
+    <div class="comment-list">
+      <% if (comments.length === 0) { %>
+        <p class="quiet">No comments yet. Be the first reader to respond.</p>
+      <% } %>
+
+      <% comments.forEach((comment) => { %>
+        <article class="comment-card">
+          <p class="meta-row quiet">
+            <span><%= comment.username %></span>
+            <span><%= shortDate(comment.created_at) %></span>
+          </p>
+          <div><%- textToParagraphs(comment.body) %></div>
+        </article>
+      <% }); %>
+    </div>
+  </section>
+</article>
+
+<%- include('partials/foot') %>

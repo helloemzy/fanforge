@@ -1,0 +1,71 @@
+<%- include('partials/head', { pageTitle: 'Create account' }) %>
+
+<section class="auth-shell reveal">
+  <p class="eyebrow">Writer onboarding</p>
+  <h1>Start publishing for free</h1>
+  <p>
+    Join to post stories, unlock full chapters, and keep fanworks in a space that
+    actively resists AI scraping.
+  </p>
+
+  <ul class="auth-points">
+    <li>Free story publishing and editing</li>
+    <li>Powerful tags for niche discoverability</li>
+    <li>Verified email + verified reader access to protect writers</li>
+  </ul>
+
+  <% if (error) { %>
+    <p class="flash error"><%= error %></p>
+  <% } %>
+
+  <form method="post" action="/auth/register" class="stack-form">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+    <input type="hidden" name="next" value="<%= nextPath %>" />
+
+    <label>
+      Username
+      <input
+        type="text"
+        name="username"
+        value="<%= values.username %>"
+        minlength="3"
+        maxlength="24"
+        autocomplete="username"
+        required
+      />
+    </label>
+
+    <label>
+      Email
+      <input
+        type="email"
+        name="email"
+        value="<%= values.email %>"
+        maxlength="160"
+        autocomplete="email"
+        required
+      />
+    </label>
+
+    <label>
+      Password
+      <input
+        type="password"
+        name="password"
+        minlength="12"
+        maxlength="128"
+        autocomplete="new-password"
+        required
+      />
+    </label>
+
+    <button type="submit" class="button-link">Create my account</button>
+  </form>
+
+  <p>
+    Already registered?
+    <a href="/auth/login">Log in</a>
+  </p>
+</section>
+
+<%- include('partials/foot') %>
