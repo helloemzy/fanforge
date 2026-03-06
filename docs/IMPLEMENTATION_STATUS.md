@@ -21,6 +21,11 @@
 - [x] Release governance checklist documented.
 - [x] `shippex.app` custom domain attached and returns HTTP 200.
 - [x] Confirmed Cloudflare zone ID for `shippex.app` is `49d6b3c84f37226ca505433768c762a4`.
+- [x] GitHub remote configured: `https://github.com/helloemzy/fanforge`.
+- [x] Git repository pushed to GitHub `main` and deployment workflow wired.
+- [x] GitHub secret wiring completed:
+  - `CLOUDFLARE_API_TOKEN`
+  - `CLOUDFLARE_ACCOUNT_ID`
 
 ## Live Cloudflare Route Checks
 
@@ -57,8 +62,8 @@
 - `shippex.app` custom domain is live and correct.
 - `www.shippex.app` is blocked by residual DNS at DNS level:
   - Cloudflare nameserver check shows zone `shippex.app` is active on Cloudflare.
-  - DNS query to public resolvers shows `www.shippex.app` resolves to Vercel edge A records, not `fanforge` Worker.
-- This is now a DNS cleanup blocker, not a Wrangler routing/deploy blocker.
+  - DNS query to public resolvers shows `www.shippex.app` resolves to Vercel edge A records, not Worker route.
+- GitHub Actions deploy runs are succeeding (most recent known run: `22750816439`).
 
 ## Pending Production Configuration
 
@@ -86,7 +91,6 @@
 ## Git Repo Status (2026-03-06)
 
 - [x] Initialized `/Users/emily/fanforge` as a git repository.
-- [x] Made a root commit: `4ae98eb` including deployment workflow, docs, and migration fixes.
-- [ ] No GitHub remote exists yet; repository has not been pushed.
-- [ ] GitHub-hosted deploy trigger to Cloudflare is documented and ready in `.github/workflows/cloudflare-workers-deploy.yml`.
-- [ ] GitHub secret wiring to Cloudflare is still pending: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
+- [x] GitHub remote exists and repo is pushed: `helloemzy/fanforge`.
+- [x] GitHub-hosted deploy trigger to Cloudflare is active in `.github/workflows/cloudflare-workers-deploy.yml`.
+- [x] GitHub secret wiring to Cloudflare is complete: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.

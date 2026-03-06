@@ -1,38 +1,27 @@
 # GitHub Remote Setup (for Cloudflare CI)
 
 Current local state:
-- `fanforge` codebase is now a git repo in `/Users/emily/fanforge`.
-- Initial commit exists: `4ae98eb`.
-- No matching GitHub remote named `origin` exists yet.
+- `fanforge` is connected to GitHub at `https://github.com/helloemzy/fanforge`.
+- Remote `origin` points to that repository and `main` is pushed.
+- GitHub Actions deploy workflow is active for every push to `main`.
 
-## Next required action
+## Completed actions
 
-Create one of these repos and attach this code:
-
-1. Create GitHub repository:
-   - `fanforge` (recommended), or
-   - another name you prefer.
-
-2. Add remote:
-   
-   ```bash
-   git remote add origin <repo-ssh-or-https-url>
-   git branch -M main
-   git push -u origin main
-   ```
-
-3. In that repo, add GitHub Secrets:
+1. Created remote repository on GitHub: `helloemzy/fanforge`.
+2. Added and set:
+   - `git remote add origin https://github.com/helloemzy/fanforge.git`
+   - `git branch -M main`
+   - `git push -u origin main`
+3. Added workflow-trigger secrets in GitHub:
    - `CLOUDFLARE_API_TOKEN`
    - `CLOUDFLARE_ACCOUNT_ID`
 
-4. In Cloudflare Workers dashboard, keep the existing deployed worker/script `fanforge` and custom domain `shippex.app` binding as configured.
-5. Confirm every merge/push to `main` triggers `.github/workflows/cloudflare-workers-deploy.yml` and deploy succeeds.
+## What this gives you
 
-## One-shot fallback for new repo creation via curl (requires token)
+- Merge/push to `main` now triggers `.github/workflows/cloudflare-workers-deploy.yml`.
+- Latest verified run is successful on the GitHub side:
+  - Run ID: `22750816439`
 
-```bash
-curl -X POST https://api.github.com/user/repos \
-  -H "Authorization: token <GITHUB_TOKEN>" \
-  -H "Accept: application/vnd.github+json" \
-  -d '{"name":"fanforge","private":false,"description":"Cloudflare Worker fanfiction platform"}'
-```
+## Current migration note
+
+Cloudflare deployment is healthy at root domain `shippex.app`; `www.shippex.app` still needs DNS cleanup before route attach.
