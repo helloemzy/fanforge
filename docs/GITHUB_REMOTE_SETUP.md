@@ -20,7 +20,7 @@ Current local state:
 
 - Merge/push to `main` now triggers `.github/workflows/cloudflare-workers-deploy.yml`.
 - Latest verified run is successful on the GitHub side:
-  - Run ID: `22750816439`
+  - Run ID: `22751524001`
 
 ## Current migration note
 
