@@ -19,6 +19,9 @@
 - [x] Execution roadmap created for remaining build phases.
 - [x] Governance automation added (`scripts/check-governance.js`) and `docs:governance` npm script.
 - [x] Release governance checklist documented.
+- [x] Persistent reading progress added with server-backed sync for trusted reader sessions.
+- [x] Continue-reading shelf added to home feed for signed-in readers.
+- [x] Reader resume UI added with saved-place indicator, resume button, and sync status.
 - [x] `shippex.app` custom domain attached and returns HTTP 200.
 - [x] Confirmed Cloudflare zone ID for `shippex.app` is `49d6b3c84f37226ca505433768c762a4`.
 - [x] GitHub remote configured: `https://github.com/helloemzy/fanforge`.
@@ -27,6 +30,7 @@
   - `CLOUDFLARE_API_TOKEN`
   - `CLOUDFLARE_ACCOUNT_ID`
 - [x] Verified GitHub workflow run `22750990026` completed successfully on latest docs/metadata push.
+- [x] Smoke test now verifies progress save and continue-reading shelf behavior.
 
 ## Live Cloudflare Route Checks
 

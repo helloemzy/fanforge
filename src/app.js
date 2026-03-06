@@ -15,6 +15,7 @@ const {
   listFandoms,
   getCommunitySnapshot,
 } = require('./db/workRepository');
+const { listContinueReading } = require('./db/interactionRepository');
 const { attachCurrentUser } = require('./middleware/authentication');
 const { attachCsrfToken } = require('./middleware/csrfProtection');
 const { textToParagraphs, shortDate } = require('./utils/textFormatting');
@@ -169,7 +170,7 @@ app.get('/', readLimiter, async (req, res, next) => {
         ? req.query.status
         : '';
 
-    const [works, trendingTags, fandoms, snapshot] = await Promise.all([
+    const [works, trendingTags, fandoms, snapshot, continueReading] = await Promise.all([
       listWorks({
         search: search || null,
         fandom: fandom || null,
@@ -182,6 +183,7 @@ app.get('/', readLimiter, async (req, res, next) => {
       listTrendingTags(12),
       listFandoms(20),
       getCommunitySnapshot(),
+      req.user ? listContinueReading({ userId: req.user.id, limit: 4 }) : Promise.resolve([]),
     ]);
 
     res.render('home', {
@@ -189,6 +191,7 @@ app.get('/', readLimiter, async (req, res, next) => {
       trendingTags,
       fandoms,
       snapshot,
+      continueReading,
       filters: {
         q: search,
         fandom,

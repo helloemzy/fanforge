@@ -82,6 +82,64 @@ const findBookmark = async ({ workId, userId }) => {
   return result.rows[0] || null;
 };
 
+const upsertReadingProgress = async ({ workId, userId, progressPercent, wordsRead }) => {
+  await query(
+    `
+      INSERT INTO reading_progress (work_id, user_id, progress_percent, words_read, last_read_at)
+      VALUES ($1, $2, $3, $4, NOW())
+      ON CONFLICT (work_id, user_id)
+      DO UPDATE SET
+        progress_percent = EXCLUDED.progress_percent,
+        words_read = EXCLUDED.words_read,
+        last_read_at = NOW()
+    `,
+    [workId, userId, progressPercent, wordsRead]
+  );
+};
+
+const findReadingProgress = async ({ workId, userId }) => {
+  const result = await query(
+    `
+      SELECT progress_percent, words_read, last_read_at
+      FROM reading_progress
+      WHERE work_id = $1 AND user_id = $2
+      LIMIT 1
+    `,
+    [workId, userId]
+  );
+
+  return result.rows[0] || null;
+};
+
+const listContinueReading = async ({ userId, limit = 4 }) => {
+  const result = await query(
+    `
+      SELECT
+        rp.progress_percent,
+        rp.words_read,
+        rp.last_read_at,
+        w.id,
+        w.title,
+        w.summary,
+        w.fandom,
+        w.rating,
+        w.status,
+        w.word_count,
+        w.cover_path,
+        u.username AS author
+      FROM reading_progress rp
+      JOIN works w ON w.id = rp.work_id
+      JOIN users u ON u.id = w.author_id
+      WHERE rp.user_id = $1
+      ORDER BY rp.last_read_at DESC
+      LIMIT $2
+    `,
+    [userId, limit]
+  );
+
+  return result.rows;
+};
+
 module.exports = {
   listCommentsByWork,
   insertComment,
@@ -89,4 +147,7 @@ module.exports = {
   hasKudos,
   upsertBookmark,
   findBookmark,
+  upsertReadingProgress,
+  findReadingProgress,
+  listContinueReading,
 };

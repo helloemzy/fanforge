@@ -11,12 +11,15 @@ const {
   hasKudos,
   upsertBookmark,
   findBookmark,
+  upsertReadingProgress,
+  findReadingProgress,
 } = require('../db/interactionRepository');
 const {
   parseOrThrow,
   workSchema,
   commentSchema,
   bookmarkSchema,
+  readingProgressSchema,
 } = require('../utils/validators');
 const {
   generateUniqueSlug,
@@ -263,10 +266,11 @@ router.get('/:workId', readLimiter, fullReadLimiter, async (req, res) => {
     return renderWorkNotFound(res);
   }
 
-  const [comments, currentBookmark, userHasKudos] = await Promise.all([
+  const [comments, currentBookmark, userHasKudos, readingProgress] = await Promise.all([
     listCommentsByWork(workId),
     req.user ? findBookmark({ workId, userId: req.user.id }) : Promise.resolve(null),
     req.user ? hasKudos({ workId, userId: req.user.id }) : Promise.resolve(false),
+    req.user ? findReadingProgress({ workId, userId: req.user.id }) : Promise.resolve(null),
   ]);
 
   const hasVerifiedEmail = Boolean(req.user?.emailVerified);
@@ -302,12 +306,48 @@ router.get('/:workId', readLimiter, fullReadLimiter, async (req, res) => {
     comments,
     userHasKudos,
     currentBookmark,
+    readingProgress,
+    canReadFullStory,
     contentLocked,
     needsEmailVerification: Boolean(req.user && !hasVerifiedEmail),
     needsHumanCheck: Boolean(req.user && hasVerifiedEmail && contentLocked),
     storyHtml,
     previewWordCount: contentLocked ? countWords(previewBody) : work.word_count,
   });
+});
+
+router.post('/:workId/progress', requireVerifiedEmail, verifyCsrf, createLimiter, async (req, res) => {
+  const workId = toNumericId(req.params.workId);
+  const work = await findWorkById(workId);
+
+  if (!work) {
+    return res.status(404).json({ ok: false, message: 'Work not found.' });
+  }
+
+  const hasReaderPass = hasValidReaderPass(req, req.user.id);
+
+  if (!hasReaderPass) {
+    return res.status(403).json({ ok: false, message: 'Trusted reader access required.' });
+  }
+
+  try {
+    const { progressPercent, wordsRead } = parseOrThrow(readingProgressSchema, req.body);
+    const clampedWordsRead = Math.min(work.word_count, Math.max(0, wordsRead));
+
+    await upsertReadingProgress({
+      workId,
+      userId: req.user.id,
+      progressPercent: Math.round(progressPercent),
+      wordsRead: clampedWordsRead,
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      message: error.message || 'Could not save reading progress.',
+    });
+  }
 });
 
 router.post('/:workId/kudos', requireVerifiedEmail, verifyCsrf, createLimiter, async (req, res) => {

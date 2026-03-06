@@ -59,6 +59,46 @@
     </p>
   </section>
 
+  <% if (canReadFullStory) { %>
+    <section class="resume-panel">
+      <div>
+        <p class="eyebrow">Your reading session</p>
+        <h2>Stay in the story</h2>
+        <p class="quiet">
+          FanForge saves your place automatically so you can jump back in from your phone or browser.
+        </p>
+      </div>
+
+      <div class="resume-panel-actions">
+        <div>
+          <p class="meta-row">
+            <span data-reading-progress-label>
+              <%= readingProgress ? `${readingProgress.progress_percent}% saved` : 'Just getting started' %>
+            </span>
+            <span data-reading-words-label>
+              <%= readingProgress ? `${readingProgress.words_read.toLocaleString('en-US')} words tracked` : 'Progress will appear after you scroll' %>
+            </span>
+          </p>
+          <div class="progress-meter progress-meter-large" aria-hidden="true">
+            <span data-reading-progress-bar style="width: <%= readingProgress?.progress_percent || 0 %>%"></span>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button
+            type="button"
+            class="button-link"
+            data-resume-reader
+            <%= !readingProgress || readingProgress.progress_percent < 8 || readingProgress.progress_percent >= 98 ? 'hidden' : '' %>
+          >
+            Resume where you left off
+          </button>
+          <button type="button" class="ghost-link" data-reader-jump-top>Start at top</button>
+        </div>
+      </div>
+    </section>
+  <% } %>
+
   <section class="reader-toolbar" data-reader-toolbar aria-label="Reader controls">
     <div class="reader-toolbar-group">
       <strong>Reader mode</strong>
@@ -73,6 +113,12 @@
       <button type="button" class="ghost-link reader-control" data-reader-theme="sepia">Sepia</button>
       <button type="button" class="ghost-link reader-control" data-reader-theme="night">Night</button>
     </div>
+    <% if (canReadFullStory) { %>
+      <div class="reader-toolbar-group reader-toolbar-status">
+        <strong>Sync</strong>
+        <span class="toolbar-status-pill" data-reading-sync-state>Saving your place</span>
+      </div>
+    <% } %>
   </section>
 
   <section class="story-content">
@@ -104,7 +150,17 @@
       </p>
     <% } %>
 
-    <div id="reader-content" class="reader-content" data-reader-content><%- storyHtml %></div>
+    <div
+      id="reader-content"
+      class="reader-content"
+      data-reader-content
+      data-work-id="<%= work.id %>"
+      data-total-words="<%= work.word_count %>"
+      data-content-locked="<%= contentLocked ? 'true' : 'false' %>"
+      data-progress-percent="<%= readingProgress?.progress_percent || 0 %>"
+      data-words-read="<%= readingProgress?.words_read || 0 %>"
+      data-csrf-token="<%= csrfToken %>"
+    ><%- storyHtml %></div>
   </section>
 
   <section id="comments" class="comments-shell">

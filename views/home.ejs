@@ -106,6 +106,45 @@
   </form>
 </section>
 
+<% if (currentUser && continueReading.length > 0) { %>
+  <section class="continue-panel reveal" aria-label="Continue reading">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Keep your place</p>
+        <h2>Continue reading</h2>
+      </div>
+      <p class="quiet">Pick up exactly where you left off on any device.</p>
+    </div>
+
+    <div class="continue-grid">
+      <% continueReading.forEach((entry) => { %>
+        <article class="continue-card">
+          <div class="continue-card-copy">
+            <p class="meta-row">
+              <span><%= entry.fandom %></span>
+              <span><%= entry.progress_percent %>% read</span>
+            </p>
+            <h3><a href="/works/<%= entry.id %>"><%= entry.title %></a></h3>
+            <p class="quiet">by <%= entry.author %></p>
+            <div class="progress-meter" aria-hidden="true">
+              <span style="width: <%= entry.progress_percent %>%"></span>
+            </div>
+            <p class="quiet">
+              <%= entry.words_read.toLocaleString('en-US') %> of
+              <%= entry.word_count.toLocaleString('en-US') %> words
+            </p>
+          </div>
+
+          <div class="continue-card-actions">
+            <a class="button-link" href="/works/<%= entry.id %>">Resume</a>
+            <p class="quiet">Last opened <%= shortDate(entry.last_read_at) %></p>
+          </div>
+        </article>
+      <% }); %>
+    </div>
+  </section>
+<% } %>
+
 <section class="content-grid" id="fresh-works">
   <div class="works-column">
     <div class="section-heading">

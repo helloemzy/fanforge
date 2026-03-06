@@ -43,6 +43,11 @@ const bookmarkSchema = z.object({
   note: z.string().trim().max(300).default(''),
 });
 
+const readingProgressSchema = z.object({
+  progressPercent: z.coerce.number().min(0).max(100),
+  wordsRead: z.coerce.number().int().min(0).max(2000000),
+});
+
 const parseOrThrow = (schema, payload) => {
   const parsed = schema.safeParse(payload);
 
@@ -60,4 +65,5 @@ module.exports = {
   workSchema,
   commentSchema,
   bookmarkSchema,
+  readingProgressSchema,
 };

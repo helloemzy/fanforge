@@ -297,6 +297,42 @@ const run = async () => {
       throw new Error('Unlocked reader view missing expected full-text marker');
     }
 
+    const unlockedCsrf = parseCsrf(unlockedDetailHtml);
+    const progressResponse = await fetch(`${baseUrl}${location}/progress`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        cookie: toCookieHeader(cookies),
+      },
+      redirect: 'manual',
+      body: JSON.stringify({
+        _csrf: unlockedCsrf,
+        progressPercent: 62,
+        wordsRead: 320,
+      }),
+    });
+
+    if (progressResponse.status !== 204) {
+      throw new Error(`Expected reading progress response 204, got ${progressResponse.status}`);
+    }
+
+    const returnHome = await fetch(`${baseUrl}/`, {
+      headers: {
+        cookie: toCookieHeader(cookies),
+      },
+      redirect: 'manual',
+    });
+
+    if (returnHome.status !== 200) {
+      throw new Error(`Expected return home 200, got ${returnHome.status}`);
+    }
+
+    const returnHomeHtml = await returnHome.text();
+
+    if (!returnHomeHtml.includes('Continue reading')) {
+      throw new Error('Home page missing continue reading shelf after progress save');
+    }
+
     console.log('Smoke check passed.');
   } finally {
     server.close();

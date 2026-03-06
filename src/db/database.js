@@ -126,6 +126,16 @@ const migrationStatements = [
   );
   `,
   `
+  CREATE TABLE IF NOT EXISTS reading_progress (
+    work_id BIGINT NOT NULL REFERENCES works(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    progress_percent INTEGER NOT NULL DEFAULT 0,
+    words_read INTEGER NOT NULL DEFAULT 0,
+    last_read_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (work_id, user_id)
+  );
+  `,
+  `
   CREATE TABLE IF NOT EXISTS email_verification_tokens (
     token_hash TEXT PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -154,6 +164,7 @@ const migrationStatements = [
   `CREATE INDEX IF NOT EXISTS idx_works_created_at ON works(created_at DESC);`,
   `CREATE INDEX IF NOT EXISTS idx_works_fandom ON works(fandom);`,
   `CREATE INDEX IF NOT EXISTS idx_comments_work ON comments(work_id);`,
+  `CREATE INDEX IF NOT EXISTS idx_reading_progress_user_last_read ON reading_progress(user_id, last_read_at DESC);`,
   `CREATE INDEX IF NOT EXISTS idx_verification_tokens_user ON email_verification_tokens(user_id);`,
   `CREATE INDEX IF NOT EXISTS idx_verification_tokens_expiry ON email_verification_tokens(expires_at);`,
   `CREATE INDEX IF NOT EXISTS idx_auth_events_ip_type ON auth_events(ip_hash, event_type, created_at DESC);`,

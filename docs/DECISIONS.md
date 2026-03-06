@@ -1,5 +1,14 @@
 # Decisions Log
 
+## 2026-03-06: Reading Progress Must Be Server-Backed
+
+- Decision: treat saved reading position as product infrastructure, not a browser-only preference.
+- Why: the core trust-first reading experience needs cross-session continuity on phone and desktop; local-only progress would break the habit loop and feel disposable.
+- Implementation:
+  - Added `reading_progress` persistence in the database layer.
+  - Added authenticated progress sync endpoint for trusted-reader sessions only.
+  - Added continue-reading shelf on the home page and resume controls on work detail pages.
+
 ## 2026-03-06: Governance Automation Precondition
 
 - Decision: enforce anti-drift checks as a hard precondition before deployment and release.

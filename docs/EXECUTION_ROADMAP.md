@@ -23,14 +23,15 @@ _Last updated: 2026-03-06_
 
 ## Week 2 — Reader UX Differentiation (Web + Mobile)
 
-- [ ] Reading surface rewrite for first 3-viewport speed
+- [x] Reading surface rewrite for first 3-viewport speed
   - Sticky controls, chapter progress bar, adaptive font stack, spacing controls.
   - Mobile-first typographic scale and line-length controls.
 - [ ] Discovery UX improvements
   - Fandom-based discovery board, filters, sort by freshness/popularity/trending.
   - Search ranking tuned for titles and metadata quality.
-- [ ] Reader habit loops
-  - Continue reading, bookmarks, follow list, read queue, notifications.
+- [~] Reader habit loops
+  - Shipped: continue-reading shelf, server-backed reading progress, resume controls.
+  - Remaining: follow list, read queue, notifications.
 
 ## Week 3 — Growth + SEO Without Exposing Text
 
